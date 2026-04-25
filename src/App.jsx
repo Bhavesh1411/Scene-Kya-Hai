@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
 import Background from './components/Background';
 import HeroScreen from './screens/HeroScreen';
-import SetupScreen from './screens/SetupScreen';
+import RoomScene from './screens/RoomScene';
 import VotingScreen from './screens/VotingScreen';
 import ResultsScreen from './screens/ResultsScreen';
 import './App.css';
 
 function App() {
-  const [screen, setScreen] = useState('hero'); // 'hero', 'setup', 'voting', 'results'
+  const [screen, setScreen] = useState('hero'); // 'hero', 'room', 'voting', 'results'
   const [players, setPlayers] = useState([]);
   const [votes, setVotes] = useState({});
 
-  const startSetup = () => setScreen('setup');
+  const startRoom = () => setScreen('room');
   
   const startVoting = (playerList) => {
     setPlayers(playerList);
@@ -34,8 +34,8 @@ function App() {
       <Background />
       
       <main className="content-wrapper">
-        {screen === 'hero' && <HeroScreen onStart={startSetup} />}
-        {screen === 'setup' && <SetupScreen onStartVoting={startVoting} />}
+        {screen === 'hero' && <HeroScreen onStart={startRoom} />}
+        {screen === 'room' && <RoomScene onStartVoting={startVoting} />}
         {screen === 'voting' && (
           <VotingScreen 
             players={players} 
