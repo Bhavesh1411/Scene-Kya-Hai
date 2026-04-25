@@ -29,7 +29,7 @@ const VotingScreen = ({ players, onFinish }) => {
       <div className="voting-header">
         <div className="player-badge">
           <span className="player-label">VOTING NOW</span>
-          <h2 className="player-name">{players[currentPlayerIndex]}</h2>
+          <h2 className="player-name">{players[currentPlayerIndex]?.name}</h2>
         </div>
         <div className="progress-bar">
           <div 

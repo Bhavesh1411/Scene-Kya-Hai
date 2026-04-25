@@ -14,9 +14,10 @@ function App() {
   const startRoom = () => setScreen('room');
   
   const startVoting = (playerList) => {
-    // playerList is optional — RoomScene uses mock data internally
-    if (playerList && playerList.length) setPlayers(playerList);
-    setScreen('voting');
+    if (playerList && playerList.length) {
+      setPlayers(playerList);
+      setScreen('voting');
+    }
   };
 
   const finishVoting = (finalVotes) => {
