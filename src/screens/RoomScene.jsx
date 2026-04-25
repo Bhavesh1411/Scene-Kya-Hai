@@ -13,101 +13,94 @@ const MOCK_PLAYERS = [
 ];
 
 const RoomScene = ({ onStartVoting }) => {
-  const [isAmbient, setIsAmbient] = useState(true);   // true = "Add Players" button shown
-  const [openPlayer, setOpenPlayer]   = useState(null);  // player whose modal is open
+  const [isAmbient, setIsAmbient]   = useState(true);
+  const [openPlayer, setOpenPlayer] = useState(null);
   const containerRef = useRef(null);
   const overlayRef   = useRef(null);
   const modalRef     = useRef(null);
 
-  /* ── Fade the whole scene in on mount ────────────── */
+  /* ── Fade scene in on mount ─────────────────────── */
   useEffect(() => {
     gsap.to(containerRef.current, {
       opacity: 1,
-      duration: 1,
+      duration: 1.1,
       ease: 'power2.out',
     });
   }, []);
 
-  /* ── Open player modal ─────────────────────────── */
+  /* ── Open player card modal ─────────────────────── */
   const openModal = (player) => {
     setOpenPlayer(player);
-    // animate overlay + modal in (RAF so modal is in DOM)
     requestAnimationFrame(() => {
-      gsap.to(overlayRef.current, { opacity: 1, duration: 0.4 });
+      if (!overlayRef.current || !modalRef.current) return;
+      gsap.to(overlayRef.current, { opacity: 1, pointerEvents: 'all', duration: 0.4 });
       gsap.fromTo(
         modalRef.current,
-        { opacity: 0, scale: 0.75, y: 40 },
+        { opacity: 0, scale: 0.78, y: 36 },
         { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.4)' }
       );
     });
   };
 
-  /* ── Close player modal ────────────────────────── */
+  /* ── Close player card modal ────────────────────── */
   const closeModal = () => {
-    gsap.to(modalRef.current,  { opacity: 0, scale: 0.8, y: 30, duration: 0.35, ease: 'power2.in' });
-    gsap.to(overlayRef.current, { opacity: 0, duration: 0.4, onComplete: () => setOpenPlayer(null) });
+    if (!overlayRef.current || !modalRef.current) return;
+    gsap.to(modalRef.current,   { opacity: 0, scale: 0.82, y: 28, duration: 0.32, ease: 'power2.in' });
+    gsap.to(overlayRef.current, {
+      opacity: 0,
+      pointerEvents: 'none',
+      duration: 0.38,
+      onComplete: () => setOpenPlayer(null),
+    });
   };
 
   return (
+    /* ── The container IS the background via CSS background-image ── */
     <div ref={containerRef} className="room-scene">
 
-      {/* ── Layer 1: full-screen background image ── */}
-      <img
-        src="/room-bg.png"
-        alt="Movie Night Room"
-        className="room-bg-img"
-        /* Inline fallback in case the CSS file loads late */
-        style={{
-          position: 'absolute',
-          inset: 0,
-          width: '100%',
-          height: '100%',
-          objectFit: 'cover',
-          objectPosition: 'center',
-          display: 'block',
-          zIndex: 1,
-        }}
-      />
-
-      {/* ── Layer 2: subtle readability veil ── */}
+      {/* Layer 1: readability gradient */}
       <div className="room-dark-veil" />
 
-      {/* ── Layer 3: card-open backdrop ── */}
-      <div
-        ref={overlayRef}
-        className="room-overlay"
-        onClick={closeModal}
-      />
+      {/* Layer 2: card-open dimmer */}
+      <div ref={overlayRef} className="room-overlay" onClick={closeModal} />
 
-      {/* ── Layer 4: header text ── */}
+      {/* Layer 3: header */}
       <header className="scene-header">
         <h2>{isAmbient ? 'The Stage is Set.' : "Who's Watching?"}</h2>
-        <p>{isAmbient ? 'Click "Add Players" on the TV screen to begin' : 'Pick a card from the table to see their pick'}</p>
+        <p>
+          {isAmbient
+            ? 'Click "Add Players" on the TV to begin'
+            : 'Pick a card from the table to see their choice'}
+        </p>
       </header>
 
-      {/* ── Layer 5a: TV zone — "Add Players" button ── */}
+      {/* ── Layer 4a: TV zone — "Add Players" button ── */}
       {isAmbient && (
         <div className="tv-zone">
-          <button
-            id="add-players-btn"
-            className="add-players-btn"
-            onClick={() => setIsAmbient(false)}
-          >
-            Add Players
-          </button>
+          {/* inner wrapper nudges the button to the "Let's Vote" row */}
+          <div className="tv-zone-inner">
+            <button
+              id="add-players-btn"
+              className="add-players-btn"
+              onClick={() => setIsAmbient(false)}
+            >
+              Add Players
+            </button>
+          </div>
         </div>
       )}
 
-      {/* ── Layer 5b: table card row ── */}
+      {/* ── Layer 4b: table card row ── */}
       {!isAmbient && (
         <div className="table-cards-row">
           {MOCK_PLAYERS.map((player) => (
             <div
               key={player.id}
-              id={`card-${player.id}`}
+              id={`ghost-card-${player.id}`}
               className="player-card-ghost"
               style={{ '--player-color': player.color }}
               onClick={() => openModal(player)}
+              title={`${player.name}'s picks`}
             >
               <div className="card-ghost-face">
                 <span className="ghost-label">{player.name}</span>
@@ -117,14 +110,16 @@ const RoomScene = ({ onStartVoting }) => {
         </div>
       )}
 
-      {/* ── Layer 6: expanded player modal ── */}
+      {/* ── Layer 5: expanded player modal ── */}
       {openPlayer && (
         <div
           ref={modalRef}
           className="player-card-modal is-open"
           style={{ '--player-color': openPlayer.color }}
         >
-          <button className="modal-close-btn" onClick={closeModal}>×</button>
+          <button className="modal-close-btn" onClick={closeModal} aria-label="Close">
+            ×
+          </button>
           <div className="modal-avatar">{openPlayer.avatar}</div>
           <h3 className="modal-name">{openPlayer.name}'s Picks</h3>
           <div className="modal-suggestions">

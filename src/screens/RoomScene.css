@@ -1,217 +1,241 @@
-/* ========================================
-   ROOM SCENE — Full-screen image background
-   ======================================== */
+/* ============================================================
+   ROOM SCENE — Full-viewport cinematic background
+   ============================================================ */
 
+/* The container is the viewport itself */
 .room-scene {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background: #000;
-  /* Start invisible — GSAP will fade this in */
+
+  /* ── THE IMAGE AS CSS BACKGROUND — covers perfectly at any size ── */
+  background-image: url('/room-bg.png');
+  background-size: cover;          /* fills viewport, maintains aspect ratio */
+  background-position: center top; /* keep the TV + friends area visible    */
+  background-repeat: no-repeat;
+
+  /* start invisible — GSAP fades in */
   opacity: 0;
 }
 
-/* ── Background image — layer 1 ─────────── */
-.room-bg-img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-  z-index: 1;
-}
-
-/* ── Subtle dark gradient on top for readability — layer 2 ─── */
+/* ── Subtle cinematic veil for text readability — z 1 ── */
 .room-dark-veil {
   position: absolute;
   inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0.35) 0%,
-    rgba(0, 0, 0, 0.10) 50%,
+    180deg,
+    rgba(0, 0, 0, 0.30) 0%,
+    rgba(0, 0, 0, 0.05) 45%,
     rgba(0, 0, 0, 0.55) 100%
   );
-  z-index: 2;
-  pointer-events: none;
 }
 
-/* ── Overlay for card dim effect — layer 3 ─── */
+/* ── Dim overlay when a card modal is open — z 2 ── */
 .room-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
   opacity: 0;
   pointer-events: none;
-  z-index: 3;
-  backdrop-filter: blur(6px);
-  transition: opacity 0.45s ease;
+  /* opacity toggled by GSAP */
 }
 
-/* ── Header text — layer 4 ─────────── */
+/* ── Header text — z 3 ── */
 .scene-header {
   position: absolute;
-  top: 32px;
+  top: 24px;
   left: 0;
   right: 0;
+  z-index: 3;
   text-align: center;
-  z-index: 10;
   pointer-events: none;
 }
 
 .scene-header h2 {
-  color: #ffffff;
-  font-size: 2rem;
-  font-weight: 800;
-  letter-spacing: 1px;
   margin: 0 0 6px;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.95);
 }
 
 .scene-header p {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 1rem;
   margin: 0;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
 }
 
-/* ── TV / Screen interaction zone — layer 5 ─── */
+/* ============================================================
+   TV SCREEN ZONE
+   Image analysis (1366 × 768 native, cover-fit):
+     TV screen left edge  ≈ 31 % of image width
+     TV screen right edge ≈ 69 % of image width
+     TV screen top edge   ≈  3 % of image height
+     TV screen bottom edge≈ 36 % of image height
+     "Let's Vote" button  ≈ 50 % H × 30 % V
+   ============================================================ */
 .tv-zone {
   position: absolute;
-  /* In the image, the TV screen occupies roughly the upper-center.
-     Adjust top/height to align the button visually on the TV screen. */
-  top: 15%;
-  left: 33%;
-  right: 33%;
-  height: 35%;
-  z-index: 10;
+
+  /* Horizontally centered within the TV panel */
+  left: 31%;
+  right: 31%;
+
+  /* Vertically spans the TV screen */
+  top: 3%;
+  height: 34%;           /* 3% → 37% covers the full TV screen */
+
+  z-index: 4;
+
+  /* Center the button inside this zone */
   display: flex;
-  align-items: center;
+  align-items: center;       /* vertical center of zone ≈ 20% = "Let's Vote" row */
   justify-content: center;
 }
 
+/* Push button slightly toward the bottom of the TV where "Let's Vote" lives */
+.tv-zone-inner {
+  margin-top: 52%;           /* nudge down to the button row inside the TV */
+}
+
+/* ── "Add Players" button ── */
 .add-players-btn {
   background: #3b82f6;
   color: #ffffff;
   border: none;
-  padding: 14px 36px;
-  border-radius: 10px;
+  padding: 10px 28px;
+  border-radius: 8px;
   font-weight: 800;
-  font-size: 1.15rem;
-  letter-spacing: 2px;
+  font-size: 1rem;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   cursor: pointer;
+  white-space: nowrap;
   box-shadow:
-    0 0 0 3px rgba(59, 130, 246, 0.4),
-    0 0 30px rgba(59, 130, 246, 0.7);
-  animation: btn-pulse 2.2s ease-in-out infinite;
-  transition: transform 0.25s ease, background 0.25s ease;
+    0 0 0 2px rgba(59, 130, 246, 0.45),
+    0 0 24px rgba(59, 130, 246, 0.65);
+  animation: btn-pulse 2.4s ease-in-out infinite;
+  transition: transform 0.22s ease, background 0.22s ease;
 }
 
 .add-players-btn:hover {
-  transform: scale(1.08);
+  transform: scale(1.1);
   background: #2563eb;
   box-shadow:
-    0 0 0 4px rgba(59, 130, 246, 0.5),
-    0 0 50px rgba(59, 130, 246, 0.9),
-    0 0 12px #fff;
+    0 0 0 3px rgba(59, 130, 246, 0.6),
+    0 0 44px rgba(59, 130, 246, 0.85),
+    0 0 10px rgba(255, 255, 255, 0.35);
 }
 
 @keyframes btn-pulse {
   0%, 100% {
     box-shadow:
-      0 0 0 3px rgba(59, 130, 246, 0.4),
-      0 0 30px rgba(59, 130, 246, 0.6);
+      0 0 0 2px rgba(59, 130, 246, 0.4),
+      0 0 24px rgba(59, 130, 246, 0.6);
   }
   50% {
     box-shadow:
-      0 0 0 5px rgba(59, 130, 246, 0.55),
-      0 0 55px rgba(59, 130, 246, 0.9),
-      0 0 10px rgba(255, 255, 255, 0.4);
+      0 0 0 4px rgba(59, 130, 246, 0.55),
+      0 0 48px rgba(59, 130, 246, 0.85),
+      0 0 10px rgba(255, 255, 255, 0.3);
   }
 }
 
-/* ── Table card row — layer 5 ─────────── */
+/* ============================================================
+   TABLE CARD ROW
+   Cards in image run from roughly 3 % to 97 % width,
+   bottom edge ≈ 5–8 % from bottom.
+   ============================================================ */
 .table-cards-row {
   position: absolute;
-  /* Card row in the image is near the very bottom */
-  bottom: 5%;
-  left: 4%;
-  right: 4%;
-  height: 190px;
-  z-index: 10;
+  bottom: 4%;
+  left: 3%;
+  right: 3%;
+  height: 200px;
+  z-index: 4;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* Individual interactive card ghost */
+/* Individual interactive card */
 .player-card-ghost {
   position: relative;
-  width: 120px;
-  height: 170px;
+  width: 110px;
+  height: 160px;
   cursor: pointer;
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .player-card-ghost:hover {
-  transform: translateY(-14px) scale(1.07);
+  transform: translateY(-16px) scale(1.08);
 }
 
 .card-ghost-face {
   position: absolute;
   inset: 0;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 2px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    0 6px 20px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding-bottom: 12px;
-  backdrop-filter: blur(2px);
-  transition: all 0.3s ease;
+  padding-bottom: 10px;
+  backdrop-filter: blur(3px);
+  transition: background 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
 }
 
 .player-card-ghost:hover .card-ghost-face {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
   border-color: var(--player-color, #3b82f6);
   box-shadow:
-    0 12px 36px rgba(0, 0, 0, 0.7),
-    0 0 20px var(--player-color, #3b82f6);
+    0 10px 32px rgba(0, 0, 0, 0.75),
+    0 0 18px var(--player-color, #3b82f6);
 }
 
 .ghost-label {
   color: #fff;
-  font-size: 0.85rem;
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
-/* ── Expanded player card (modal style) — layer 20 ─── */
+/* ============================================================
+   EXPANDED PLAYER MODAL — floats above everything
+   ============================================================ */
 .player-card-modal {
   position: fixed;
   top: 50%;
   left: 50%;
+  /* start: invisible + shrunk — GSAP will animate in */
   transform: translate(-50%, -50%) scale(0.8);
-  width: 340px;
-  background: #111827;
-  border-radius: 20px;
-  padding: 28px 24px;
-  z-index: 30;
   opacity: 0;
   pointer-events: none;
+
+  width: min(340px, 90vw);
+  background: #0f172a;
+  border-radius: 20px;
+  padding: 28px 22px 24px;
   border-top: 5px solid var(--player-color, #3b82f6);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
-  transition: none; /* GSAP handles this */
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.92),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  z-index: 20;
 }
 
 .player-card-modal.is-open {
@@ -220,69 +244,68 @@
 
 .modal-close-btn {
   position: absolute;
-  top: 14px;
-  right: 16px;
-  background: rgba(255,255,255,0.08);
+  top: 12px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.07);
   border: none;
   color: #9ca3af;
-  font-size: 1.4rem;
-  line-height: 1;
-  width: 32px;
-  height: 32px;
+  font-size: 1.3rem;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.2s, color 0.2s;
 }
 
 .modal-close-btn:hover {
-  background: rgba(255,255,255,0.16);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 
 .modal-avatar {
-  font-size: 3rem;
+  font-size: 2.8rem;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .modal-name {
   color: #fff;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 700;
   text-align: center;
-  margin: 0 0 20px;
+  margin: 0 0 18px;
 }
 
 .modal-suggestions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 22px;
 }
 
 .suggestion-chip {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 11px 14px;
 }
 
 .suggestion-chip span {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .suggestion-chip strong {
   display: block;
   color: #e5e7eb;
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 600;
 }
 
@@ -294,20 +317,20 @@
   padding: 13px;
   border-radius: 10px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  letter-spacing: 0.5px;
-  transition: all 0.25s ease;
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.35);
+  letter-spacing: 0.4px;
+  transition: background 0.22s, transform 0.22s, box-shadow 0.22s;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
 .ready-vote-btn:hover {
   background: #2563eb;
   transform: translateY(-2px);
-  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.55);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.55);
 }
 
-/* ── Reduced motion ─────────────────────── */
+/* ── Reduced-motion ────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .add-players-btn { animation: none; }
   .player-card-ghost,
