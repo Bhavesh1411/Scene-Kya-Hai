@@ -168,7 +168,7 @@ const HeroScreen = ({ onStart }) => {
         { x: '-100%', opacity: 0 },
         { 
           x: '200%', 
-          opacity: 0.3, 
+          opacity: 0.5, 
           duration: 12, 
           repeat: -1, 
           ease: "none",

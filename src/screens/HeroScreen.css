@@ -150,8 +150,8 @@
   width: 600px;
   height: 100vh;
   background: linear-gradient(to top, 
-    rgba(255, 255, 255, 0.3) 0%, 
-    rgba(255, 255, 255, 0.05) 50%, 
+    rgba(255, 255, 255, 0.4) 0%, 
+    rgba(255, 255, 255, 0.1) 50%, 
     transparent 100%
   );
   transform-origin: bottom center;
@@ -162,7 +162,7 @@
   mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 80%);
   -webkit-mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 80%);
   filter: blur(15px);
-  opacity: 0.25;
+  opacity: 0.45;
 }
 
 .spotlight-left .spotlight-beam {
@@ -189,7 +189,7 @@
     45deg,
     transparent 0%,
     transparent 45%,
-    rgba(255, 255, 255, 0.04) 50%,
+    rgba(255, 255, 255, 0.08) 50%,
     transparent 55%,
     transparent 100%
   );
