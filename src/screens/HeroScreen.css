@@ -147,30 +147,30 @@
   position: absolute;
   bottom: 35px;
   left: 50%;
-  width: 600px;
+  width: 300px; /* Narrower width for torch effect */
   height: 100vh;
   background: linear-gradient(to top, 
-    rgba(255, 255, 255, 0.4) 0%, 
-    rgba(255, 255, 255, 0.1) 50%, 
+    rgba(255, 255, 255, 0.5) 0%, 
+    rgba(255, 255, 255, 0.2) 60%, 
     transparent 100%
   );
   transform-origin: bottom center;
-  /* Realistic Cone Shape */
-  clip-path: polygon(48% 0, 0 100%, 100% 100%);
-  -webkit-clip-path: polygon(48% 0, 0 100%, 100% 100%);
-  /* Feathered Edges */
-  mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 80%);
-  -webkit-mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 80%);
-  filter: blur(15px);
-  opacity: 0.45;
+  /* Focused Torch Shape (Narrow Bottom, Broad Top) */
+  clip-path: polygon(50% 100%, -20% 0, 120% 0);
+  -webkit-clip-path: polygon(50% 100%, -20% 0, 120% 0);
+  /* Sharper Edges */
+  mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 90%);
+  -webkit-mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 90%);
+  filter: blur(8px);
+  opacity: 0.6;
 }
 
 .spotlight-left .spotlight-beam {
-  transform: translateX(-50%) rotate(35deg);
+  transform: translateX(-50%) rotate(28deg);
 }
 
 .spotlight-right .spotlight-beam {
-  transform: translateX(-50%) rotate(-35deg);
+  transform: translateX(-50%) rotate(-28deg);
 }
 
 .spotlight-target {
