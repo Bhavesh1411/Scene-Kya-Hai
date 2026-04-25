@@ -213,3 +213,186 @@
     font-size: 2.5rem;
   }
 }
+
+/* -- ANALYTICS DASHBOARD -- */
+.analytics-dashboard {
+  width: 100%;
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0 0 60px;
+}
+
+.analytics-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 28px;
+  opacity: 0; /* animated in by GSAP */
+}
+
+.analytics-heading {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #94a3b8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+/* Score Delta */
+.delta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.delta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.delta-medal { font-size: 1.4rem; width: 32px; flex-shrink: 0; }
+
+.delta-title {
+  flex: 1;
+  font-weight: 700;
+  color: #e2e8f0;
+  font-size: 1rem;
+}
+
+.delta-score {
+  font-weight: 800;
+  color: #60a5fa;
+  font-size: 0.95rem;
+}
+
+.delta-diff {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.12);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+/* Consensus Cards */
+.consensus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.consensus-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.consensus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.consensus-title {
+  font-weight: 700;
+  color: #e2e8f0;
+  font-size: 1rem;
+}
+
+.consensus-total {
+  font-weight: 800;
+  color: #60a5fa;
+  font-size: 0.85rem;
+}
+
+.consensus-votes {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.vote-chip {
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.love-chip { background: rgba(244,114,182,0.15); color: #f472b6; }
+.yes-chip  { background: rgba(74,222,128,0.15);  color: #4ade80; }
+.no-chip   { background: rgba(248,113,113,0.15); color: #f87171; }
+
+.consensus-bar-track {
+  height: 6px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  overflow: hidden;
+}
+
+.consensus-bar { height: 100%; }
+.love-bar { background: #f472b6; }
+.yes-bar  { background: #4ade80; }
+.no-bar   { background: #f87171; }
+
+/* Sentiment Matrix */
+.matrix-scroll {
+  overflow-x: auto;
+  border-radius: 12px;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.matrix-th {
+  padding: 10px 16px;
+  text-align: center;
+  color: #64748b;
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+}
+
+.matrix-th:first-child { text-align: left; }
+
+.movie-th {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.matrix-player {
+  padding: 12px 16px;
+  font-weight: 700;
+  color: #e2e8f0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+}
+
+.matrix-cell {
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 1.1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.cell-love { background: rgba(244,114,182,0.08); }
+.cell-yes  { background: rgba(74,222,128,0.08); }
+.cell-no   { background: rgba(248,113,113,0.08); }
+.cell-none { color: #334155; }

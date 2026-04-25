@@ -61,6 +61,37 @@ const ResultsScreen = ({ votes, onRestart }) => {
   const topThree = movieResults.slice(0, 3);
   const rest = movieResults.slice(3);
 
+  // Per-film vote breakdown: { [movieTitle]: { yes, love, no } }
+  const voteBreakdown = useMemo(() => {
+    const breakdown = {};
+    if (Array.isArray(votes)) {
+      votes.forEach(session => {
+        session.votes.forEach(({ movie, vote }) => {
+          if (!breakdown[movie]) breakdown[movie] = { yes: 0, love: 0, no: 0 };
+          breakdown[movie][vote] = (breakdown[movie][vote] || 0) + 1;
+        });
+      });
+    }
+    return breakdown;
+  }, [votes]);
+
+  // Sentiment matrix: { [playerName]: { [movieTitle]: vote } }
+  const sentimentMatrix = useMemo(() => {
+    const matrix = {};
+    if (Array.isArray(votes)) {
+      votes.forEach(session => {
+        matrix[session.name] = {};
+        session.votes.forEach(({ movie, vote }) => {
+          matrix[session.name][movie] = vote;
+        });
+      });
+    }
+    return matrix;
+  }, [votes]);
+
+  const allMovies = movieResults.map(m => m.title);
+  const allPlayers = Object.keys(sentimentMatrix);
+
   useEffect(() => {
     if (movieResults.length === 0) return;
 
@@ -140,6 +171,13 @@ const ResultsScreen = ({ votes, onRestart }) => {
       { opacity: 0, y: 20 },
       { opacity: 1, y: 0, duration: 0.8 },
       "-=0.5"
+    );
+
+    // 6. Fade in analytics sections
+    tl.fromTo(".analytics-section",
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.6, stagger: 0.2 },
+      "-=0.2"
     );
 
   }, [movieResults, topThree]);
@@ -227,6 +265,98 @@ const ResultsScreen = ({ votes, onRestart }) => {
             <RotateCcw size={20} />
             <span>New Session</span>
           </button>
+        </div>
+
+        {/* ── ANALYTICS DASHBOARD ── */}
+        <div className="analytics-dashboard">
+
+          {/* 1. Score Delta Section */}
+          <div className="analytics-section">
+            <h2 className="analytics-heading">🏅 Score Breakdown</h2>
+            <div className="delta-list">
+              {movieResults.map((movie, idx) => {
+                const delta = idx === 0 ? null : movie.score - movieResults[0].score;
+                const medal = ['🥇','🥈','🥉'][idx] || `#${idx+1}`;
+                return (
+                  <div key={movie.id} className="delta-row">
+                    <span className="delta-medal">{medal}</span>
+                    <span className="delta-title">{movie.title}</span>
+                    <span className="delta-score">{movie.score} pts</span>
+                    {delta !== null && (
+                      <span className="delta-diff">{delta}</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 2. Per-Film Consensus */}
+          <div className="analytics-section">
+            <h2 className="analytics-heading">🎬 Film Consensus</h2>
+            <div className="consensus-list">
+              {movieResults.map(movie => {
+                const b = voteBreakdown[movie.title] || { yes: 0, love: 0, no: 0 };
+                const total = b.yes + b.love + b.no;
+                return (
+                  <div key={movie.id} className="consensus-card">
+                    <div className="consensus-header">
+                      <span className="consensus-title">{movie.title}</span>
+                      <span className="consensus-total">{movie.score} pts</span>
+                    </div>
+                    <div className="consensus-votes">
+                      <span className="vote-chip love-chip">❤️ {b.love}</span>
+                      <span className="vote-chip yes-chip">👍 {b.yes}</span>
+                      <span className="vote-chip no-chip">❌ {b.no}</span>
+                    </div>
+                    <div className="consensus-bar-track">
+                      {total > 0 && (
+                        <>
+                          <div className="consensus-bar love-bar" style={{ width: `${(b.love/total)*100}%` }} />
+                          <div className="consensus-bar yes-bar" style={{ width: `${(b.yes/total)*100}%` }} />
+                          <div className="consensus-bar no-bar" style={{ width: `${(b.no/total)*100}%` }} />
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. Sentiment Matrix */}
+          {allPlayers.length > 0 && allMovies.length > 0 && (
+            <div className="analytics-section">
+              <h2 className="analytics-heading">👥 Sentiment Matrix</h2>
+              <div className="matrix-scroll">
+                <table className="matrix-table">
+                  <thead>
+                    <tr>
+                      <th className="matrix-th">Player</th>
+                      {allMovies.map(m => (
+                        <th key={m} className="matrix-th movie-th">{m}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allPlayers.map(player => (
+                      <tr key={player}>
+                        <td className="matrix-player">{player}</td>
+                        {allMovies.map(movie => {
+                          const v = sentimentMatrix[player]?.[movie];
+                          const emoji = v === 'love' ? '❤️' : v === 'yes' ? '👍' : v === 'no' ? '❌' : '—';
+                          return (
+                            <td key={movie} className={`matrix-cell cell-${v || 'none'}`}>{emoji}</td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
         </div>
       </div>
     </div>
