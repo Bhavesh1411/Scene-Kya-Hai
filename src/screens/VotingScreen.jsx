@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import './VotingScreen.css';
 
 const VotingScreen = ({ players, onFinish }) => {
-  // Extract unique movie suggestions from all players
+  // Extract unique movie suggestions
   const moviePool = useMemo(() => {
     const suggestions = players
       .map(p => p.suggestion)
@@ -13,13 +13,37 @@ const VotingScreen = ({ players, onFinish }) => {
 
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [currentMovieIndex, setCurrentMovieIndex] = useState(0);
-  const [allVotes, setAllVotes] = useState([]); // Array of { name, votes: [{ movie, vote }] }
-  const [currentSessionVotes, setCurrentSessionVotes] = useState([]); // Current player's votes
+  const [allVotes, setAllVotes] = useState([]);
+  const [currentSessionVotes, setCurrentSessionVotes] = useState([]);
+  
+  // Feedback state for labels
+  const [swipeFeedback, setSwipeFeedback] = useState(null); // 'LIKE', 'NOPE', 'LOVE'
+  const [likedCount, setLikedCount] = useState(0);
+
+  const cardRef = useRef(null);
+  const containerRef = useRef(null);
+  const dragStartPos = useRef({ x: 0, y: 0 });
+  const isDragging = useRef(false);
 
   const currentPlayer = players[currentPlayerIndex];
   const currentMovie = moviePool[currentMovieIndex];
 
-  // If no movies were suggested, we should handle this gracefully
+  // Floating animation effect
+  useEffect(() => {
+    if (cardRef.current) {
+      gsap.to(cardRef.current, {
+        y: "-=15",
+        rotation: 2,
+        duration: 2.5,
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+    }
+    // Cleanup float on drag
+    return () => gsap.killTweensOf(cardRef.current);
+  }, [currentMovieIndex, currentPlayerIndex]);
+
   if (moviePool.length === 0) {
     return (
       <div className="voting-container empty-state">
@@ -34,111 +58,209 @@ const VotingScreen = ({ players, onFinish }) => {
     );
   }
 
-  const handleVote = (voteType) => {
-    // Pop effect animation
-    gsap.fromTo('.voting-card', 
-      { scale: 1 }, 
-      { scale: 1.1, duration: 0.1, yoyo: true, repeat: 1, ease: 'power2.out' }
-    );
+  const handleDragStart = (e) => {
+    isDragging.current = true;
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    dragStartPos.current = { x: clientX, y: clientY };
+    
+    // Stop floating animation
+    gsap.killTweensOf(cardRef.current);
+  };
 
+  const handleDragMove = (e) => {
+    if (!isDragging.current || !cardRef.current) return;
+
+    const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+    const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+    
+    const deltaX = clientX - dragStartPos.current.x;
+    const deltaY = clientY - dragStartPos.current.y;
+    
+    const rotation = deltaX * 0.1;
+
+    gsap.set(cardRef.current, {
+      x: deltaX,
+      y: deltaY,
+      rotation: rotation
+    });
+
+    // Determine feedback
+    if (deltaY < -100) setSwipeFeedback('LOVE');
+    else if (deltaX > 100) setSwipeFeedback('LIKE');
+    else if (deltaX < -100) setSwipeFeedback('NOPE');
+    else setSwipeFeedback(null);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    
+    const x = gsap.getProperty(cardRef.current, "x");
+    const y = gsap.getProperty(cardRef.current, "y");
+    
+    const threshold = 150;
+
+    if (y < -threshold) {
+      triggerVote('love');
+    } else if (x > threshold) {
+      triggerVote('yes');
+    } else if (x < -threshold) {
+      triggerVote('no');
+    } else {
+      // Snap back
+      setSwipeFeedback(null);
+      gsap.to(cardRef.current, {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        duration: 0.5,
+        ease: "elastic.out(1, 0.5)",
+        onComplete: () => {
+          // Restart floating
+          gsap.to(cardRef.current, {
+            y: "-=15",
+            rotation: 2,
+            duration: 2.5,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut"
+          });
+        }
+      });
+    }
+  };
+
+  const triggerVote = (type) => {
+    setSwipeFeedback(null);
+    const tl = gsap.timeline();
+
+    if (type === 'no') {
+      // Crumpled paper effect
+      tl.to(cardRef.current, {
+        scale: 0.4,
+        rotation: 180,
+        borderRadius: "50%",
+        opacity: 0,
+        x: -500,
+        y: 500,
+        duration: 0.8,
+        ease: "power2.in",
+        onComplete: () => nextItem(type)
+      });
+    } else {
+      // Fly to collection zone
+      tl.to(cardRef.current, {
+        x: 600,
+        y: 200,
+        rotation: 45,
+        scale: 0.2,
+        opacity: 0,
+        duration: 0.6,
+        ease: "back.in(1.2)",
+        onComplete: () => {
+          setLikedCount(prev => prev + 1);
+          nextItem(type);
+        }
+      });
+    }
+  };
+
+  const nextItem = (voteType) => {
     const newVote = { movie: currentMovie, vote: voteType };
     const updatedSessionVotes = [...currentSessionVotes, newVote];
 
     if (currentMovieIndex < moviePool.length - 1) {
-      // Move to next movie for current player
       setCurrentSessionVotes(updatedSessionVotes);
       setCurrentMovieIndex(currentMovieIndex + 1);
       
-      // Slide animation for next movie
-      gsap.fromTo('.movie-title-display', 
-        { x: 50, opacity: 0 }, 
-        { x: 0, opacity: 1, duration: 0.4, ease: 'power2.out' }
-      );
+      // Reset card position for next
+      gsap.set(cardRef.current, { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, borderRadius: "32px" });
+      gsap.from(cardRef.current, { scale: 0, opacity: 0, duration: 0.5, ease: "back.out" });
     } else {
-      // Current player finished all movies
-      const playerFinalData = {
-        name: currentPlayer.name,
-        votes: updatedSessionVotes
-      };
-      
+      // Next player or Finish
+      const playerFinalData = { name: currentPlayer.name, votes: updatedSessionVotes };
       const updatedAllVotes = [...allVotes, playerFinalData];
       
       if (currentPlayerIndex < players.length - 1) {
-        // Show transition to next player
         setAllVotes(updatedAllVotes);
         setCurrentPlayerIndex(currentPlayerIndex + 1);
         setCurrentMovieIndex(0);
         setCurrentSessionVotes([]);
-        
-        // Transition animation
-        gsap.fromTo('.voting-container', 
-          { opacity: 0.5 }, 
-          { opacity: 1, duration: 0.8 }
-        );
+        setLikedCount(0);
+        gsap.set(cardRef.current, { x: 0, y: 0, rotation: 0, scale: 1, opacity: 1, borderRadius: "32px" });
       } else {
-        // Everyone finished!
         onFinish(updatedAllVotes);
       }
     }
   };
 
   return (
-    <div className="voting-container">
-      <div className="voting-header">
-        <div className="player-turn-badge">
-          <span className="turn-label">CURRENT VOTER</span>
-          <h2 className="turn-name">{currentPlayer.name}’s Turn 🎬</h2>
+    <div 
+      className="voting-container cinematic-room"
+      onMouseMove={handleDragMove}
+      onMouseUp={handleDragEnd}
+      onMouseLeave={handleDragEnd}
+      onTouchMove={handleDragMove}
+      onTouchEnd={handleDragEnd}
+    >
+      <div className="room-bg-layer" />
+      
+      <header className="voter-header">
+        <div className="player-badge">
+          <span className="label">TURN</span>
+          <h3>{currentPlayer.name}’s Choice 🎬</h3>
         </div>
-        
-        <div className="voting-progress">
-          <div className="progress-text">
-            Movie {currentMovieIndex + 1} of {moviePool.length}
-          </div>
-          <div className="progress-bar-bg">
-            <div 
-              className="progress-bar-fill"
-              style={{ width: `${((currentMovieIndex + 1) / moviePool.length) * 100}%` }}
-            ></div>
-          </div>
+        <div className="progress-indicator">
+          {currentMovieIndex + 1} / {moviePool.length}
         </div>
-      </div>
+      </header>
 
-      <div className="voting-main">
-        <div className="voting-card glass-card">
-          <div className="movie-tag">VOTE ON THIS MOVIE</div>
-          <div className="movie-title-display">
+      {/* Visual Feedback Labels */}
+      {swipeFeedback && (
+        <div className={`swipe-label ${swipeFeedback.toLowerCase()}`}>
+          {swipeFeedback}
+        </div>
+      )}
+
+      {/* Main Swipe Card */}
+      <div className="swipe-stack-container">
+        <div 
+          ref={cardRef} 
+          className="movie-swipe-card"
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+        >
+          <div className="card-top">CINEMA TICKET</div>
+          <div className="card-body">
             <h1>{currentMovie}</h1>
           </div>
-          <div className="voter-context">
-            Wait, who suggested this? <span>(Anonymous)</span>
-          </div>
-        </div>
-
-        <div className="action-buttons">
-          <button className="vote-btn dislike" onClick={() => handleVote('no')}>
-            <span className="icon">❌</span>
-            <span className="label">No</span>
-          </button>
-          
-          <button className="vote-btn like" onClick={() => handleVote('yes')}>
-            <span className="icon">👍</span>
-            <span className="label">Yes</span>
-          </button>
-          
-          <button className="vote-btn love" onClick={() => handleVote('love')}>
-            <span className="icon">❤️</span>
-            <span className="label">Love</span>
-          </button>
+          <div className="card-footer">DRAG TO VOTE</div>
         </div>
       </div>
 
-      <div className="voting-footer">
-        <p>Player {currentPlayerIndex + 1} of {players.length} voting</p>
-        <div className="player-dots">
-          {players.map((_, i) => (
-            <div key={i} className={`dot ${i === currentPlayerIndex ? 'active' : i < currentPlayerIndex ? 'done' : ''}`}></div>
-          ))}
+      {/* Scene Elements */}
+      <div className="room-decoration-layer">
+        <div className="trash-zone">
+          <div className="dustbin">🗑️</div>
+          <span>DISLIKE</span>
         </div>
+
+        <div className="collection-zone">
+          <div className="liked-stack">
+            {Array.from({ length: likedCount }).map((_, i) => (
+              <div key={i} className="stacked-card" style={{ 
+                transform: `rotate(${i * 5}deg) translate(${i * 2}px, -${i * 2}px)` 
+              }} />
+            ))}
+            <div className="liked-icon">❤️</div>
+          </div>
+          <span>LIKED</span>
+        </div>
+      </div>
+
+      <div className="gesture-hint">
+        ← NOPE | LOVE ↑ | YES →
       </div>
     </div>
   );
