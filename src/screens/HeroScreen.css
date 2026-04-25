@@ -74,18 +74,18 @@
 .spotlight {
   position: absolute;
   bottom: 0;
-  width: 120px;
-  height: 200px;
-  z-index: 15;
+  width: 150px;
+  height: 150px;
+  z-index: 20;
   pointer-events: none;
 }
 
 .spotlight-left {
-  left: 5%;
+  left: 0;
 }
 
 .spotlight-right {
-  right: 5%;
+  right: 0;
 }
 
 .spotlight-stand {
@@ -93,37 +93,40 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
-  height: 60px;
+  width: 60px;
+  height: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .stand-head {
-  width: 32px;
-  height: 24px;
+  width: 48px;
+  height: 40px;
   background: #1e293b;
-  border-radius: 4px;
-  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px 24px 4px 4px; /* Curved realistic head */
+  border: 2px solid rgba(255, 255, 255, 0.15);
   position: relative;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+  transform-origin: bottom center;
 }
 
 .stand-head::after {
   content: '';
   position: absolute;
-  top: 50%;
+  top: 5px;
   left: 50%;
-  transform: translate(-50%, -50%);
-  width: 12px;
-  height: 12px;
+  transform: translateX(-50%);
+  width: 16px;
+  height: 8px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 0 15px #fff;
+  box-shadow: 0 0 20px 5px #fff;
+  opacity: 0.8;
 }
 
 .stand-base {
-  width: 4px;
+  width: 6px;
   height: 40px;
   background: #0f172a;
 }
@@ -134,50 +137,45 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 40px;
-  height: 4px;
+  width: 50px;
+  height: 6px;
   background: #0f172a;
-  border-radius: 2px;
+  border-radius: 3px;
 }
 
 .spotlight-beam {
   position: absolute;
-  bottom: 50px;
+  bottom: 35px;
   left: 50%;
-  width: 400px;
+  width: 600px;
   height: 100vh;
   background: linear-gradient(to top, 
-    rgba(255, 255, 255, 0.25) 0%, 
-    rgba(255, 255, 255, 0.1) 40%, 
+    rgba(255, 255, 255, 0.3) 0%, 
+    rgba(255, 255, 255, 0.05) 50%, 
     transparent 100%
   );
   transform-origin: bottom center;
-  mask-image: radial-gradient(ellipse at bottom, black 0%, transparent 70%);
-  -webkit-mask-image: radial-gradient(ellipse at bottom, black 0%, transparent 70%);
-  filter: blur(8px);
-  opacity: 0.3;
+  /* Realistic Cone Shape */
+  clip-path: polygon(48% 0, 0 100%, 100% 100%);
+  -webkit-clip-path: polygon(48% 0, 0 100%, 100% 100%);
+  /* Feathered Edges */
+  mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at bottom, black 20%, transparent 80%);
+  filter: blur(15px);
+  opacity: 0.25;
 }
 
 .spotlight-left .spotlight-beam {
-  transform: translateX(-50%) rotate(40deg);
+  transform: translateX(-50%) rotate(35deg);
 }
 
 .spotlight-right .spotlight-beam {
-  transform: translateX(-50%) rotate(-40deg);
+  transform: translateX(-50%) rotate(-35deg);
 }
 
 .spotlight-target {
-  transition: all 0.3s ease;
+  transition: all 0.5s ease;
   position: relative;
-}
-
-.spotlight-target::after {
-  content: '';
-  position: absolute;
-  inset: -20px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
-  pointer-events: none;
-  border-radius: inherit;
 }
 
 /* Diagonal Ambient Sweep */
@@ -185,20 +183,20 @@
   position: absolute;
   top: -50%;
   left: -50%;
-  width: 200%;
-  height: 200%;
+  width: 250%;
+  height: 250%;
   background: linear-gradient(
     45deg,
     transparent 0%,
-    transparent 40%,
-    rgba(255, 255, 255, 0.08) 50%,
-    transparent 60%,
+    transparent 45%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 55%,
     transparent 100%
   );
-  transform: rotate(-15deg);
+  transform: rotate(-20deg);
   pointer-events: none;
   z-index: 5;
-  filter: blur(120px);
+  filter: blur(150px);
 }
 
 @media (max-width: 1024px) {
