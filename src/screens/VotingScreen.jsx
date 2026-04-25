@@ -4,12 +4,19 @@ import './VotingScreen.css';
 
 const VotingScreen = ({ players, onFinish }) => {
   const moviePool = useMemo(() => {
-    // Demo Movies for Judges Presentation
-    const demoMovies = ["Dhurandhar", "PK", "RA One"];
-    const userSuggestions = players.flatMap(p => p.suggestions || []).filter(s => s && s.trim() !== '');
-    
-    // Prepend demo movies and ensure unique list
-    return [...new Set([...demoMovies, ...userSuggestions])];
+    // Collect ONLY user-entered suggestions
+    const raw = players.flatMap(p => p.suggestions || []).filter(s => s && s.trim() !== '');
+
+    // Deduplicate by normalized key (trim + lowercase) — keep first-seen casing
+    const seen = new Map();
+    raw.forEach(s => {
+      const key = s.trim().toLowerCase();
+      if (!seen.has(key)) seen.set(key, s.trim());
+    });
+
+    const pool = [...seen.values()];
+    console.log("[VotingScreen] Final movie pool:", pool);
+    return pool;
   }, [players]);
 
   const movieImages = {

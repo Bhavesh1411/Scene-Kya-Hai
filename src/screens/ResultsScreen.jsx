@@ -16,80 +16,75 @@ const ResultsScreen = ({ votes, onRestart }) => {
   };
 
   const movieResults = useMemo(() => {
-    // 1. Log all raw votes for debugging
     console.log("--- RAW VOTING DATA ---");
     console.log(JSON.stringify(votes, null, 2));
 
-    const scores = {};
-    
-    // 2. Aggregate scores from all players
+    // Normalize key = trim + lowercase to prevent duplicates
+    const scores = {};      // key -> points
+    const canonical = {};   // key -> display title (first-seen casing)
+
     if (Array.isArray(votes)) {
       votes.forEach(playerSession => {
         playerSession.votes.forEach(voteItem => {
-          const movieTitle = voteItem.movie;
+          const raw = voteItem.movie;
+          const key = raw.trim().toLowerCase();
           const voteValue = voteItem.vote;
-          
+
+          if (!canonical[key]) canonical[key] = raw.trim();
+
           let points = 0;
           if (voteValue === 'love') points = 3;
           else if (voteValue === 'yes') points = 1;
-          else if (voteValue === 'no') points = 0;
-          
-          scores[movieTitle] = (scores[movieTitle] || 0) + points;
+
+          scores[key] = (scores[key] || 0) + points;
         });
       });
     }
 
-    // 3. Log calculated scores
-    console.log("--- CALCULATED SCORES ---");
-    console.log(scores);
-
-    // 4. Convert to sorted array
     const sortedResults = Object.entries(scores)
-      .map(([title, score]) => ({
-        id: title,
-        title: title,
-        score: score
-      }))
+      .map(([key, score]) => ({ id: key, title: canonical[key], score }))
       .sort((a, b) => b.score - a.score);
 
-    console.log("--- SORTED RANKINGS ---");
-    console.log(sortedResults);
-
+    console.log("--- CALCULATED SCORES ---", scores);
+    console.log("--- SORTED RANKINGS ---", sortedResults);
     return sortedResults;
   }, [votes]);
 
   const topThree = movieResults.slice(0, 3);
   const rest = movieResults.slice(3);
 
-  // Per-film vote breakdown: { [movieTitle]: { yes, love, no } }
+  // Per-film vote breakdown: { [normalizedKey]: { yes, love, no, title } }
   const voteBreakdown = useMemo(() => {
     const breakdown = {};
     if (Array.isArray(votes)) {
       votes.forEach(session => {
         session.votes.forEach(({ movie, vote }) => {
-          if (!breakdown[movie]) breakdown[movie] = { yes: 0, love: 0, no: 0 };
-          breakdown[movie][vote] = (breakdown[movie][vote] || 0) + 1;
+          const key = movie.trim().toLowerCase();
+          if (!breakdown[key]) breakdown[key] = { yes: 0, love: 0, no: 0 };
+          if (vote in breakdown[key]) breakdown[key][vote]++;
         });
       });
     }
     return breakdown;
   }, [votes]);
 
-  // Sentiment matrix: { [playerName]: { [movieTitle]: vote } }
+  // Sentiment matrix: { [playerName]: { [normalizedMovieKey]: vote } }
   const sentimentMatrix = useMemo(() => {
     const matrix = {};
     if (Array.isArray(votes)) {
       votes.forEach(session => {
         matrix[session.name] = {};
         session.votes.forEach(({ movie, vote }) => {
-          matrix[session.name][movie] = vote;
+          const key = movie.trim().toLowerCase();
+          matrix[session.name][key] = vote;
         });
       });
     }
     return matrix;
   }, [votes]);
 
-  const allMovies = movieResults.map(m => m.title);
+  // Use normalized keys for matrix columns, display canonical titles
+  const allMovies = movieResults.map(m => ({ key: m.id, title: m.title }));
   const allPlayers = Object.keys(sentimentMatrix);
 
   useEffect(() => {
@@ -296,7 +291,7 @@ const ResultsScreen = ({ votes, onRestart }) => {
             <h2 className="analytics-heading">🎬 Film Consensus</h2>
             <div className="consensus-list">
               {movieResults.map(movie => {
-                const b = voteBreakdown[movie.title] || { yes: 0, love: 0, no: 0 };
+                const b = voteBreakdown[movie.id] || { yes: 0, love: 0, no: 0 };
                 const total = b.yes + b.love + b.no;
                 return (
                   <div key={movie.id} className="consensus-card">
@@ -334,7 +329,7 @@ const ResultsScreen = ({ votes, onRestart }) => {
                     <tr>
                       <th className="matrix-th">Player</th>
                       {allMovies.map(m => (
-                        <th key={m} className="matrix-th movie-th">{m}</th>
+                        <th key={m.key} className="matrix-th movie-th">{m.title}</th>
                       ))}
                     </tr>
                   </thead>
@@ -343,10 +338,10 @@ const ResultsScreen = ({ votes, onRestart }) => {
                       <tr key={player}>
                         <td className="matrix-player">{player}</td>
                         {allMovies.map(movie => {
-                          const v = sentimentMatrix[player]?.[movie];
+                          const v = sentimentMatrix[player]?.[movie.key];
                           const emoji = v === 'love' ? '❤️' : v === 'yes' ? '👍' : v === 'no' ? '❌' : '—';
                           return (
-                            <td key={movie} className={`matrix-cell cell-${v || 'none'}`}>{emoji}</td>
+                            <td key={movie.key} className={`matrix-cell cell-${v || 'none'}`}>{emoji}</td>
                           );
                         })}
                       </tr>
