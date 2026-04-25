@@ -1,0 +1,117 @@
+.setup-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--space-4);
+}
+
+.setup-card {
+  width: 100%;
+  max-width: 480px;
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.setup-title {
+  font-size: 2rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.setup-subtitle {
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: var(--space-2);
+}
+
+.players-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.player-input-group {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.player-input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.player-input:focus {
+  border-color: var(--primary);
+  background: rgba(59, 130, 246, 0.05);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.remove-btn {
+  color: var(--text-muted);
+  padding: 8px;
+}
+
+.remove-btn:hover {
+  color: #ef4444;
+}
+
+.add-player-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 12px;
+  color: var(--accent);
+  font-weight: 600;
+  border: 1px dashed rgba(20, 184, 166, 0.3);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-1);
+}
+
+.add-player-btn:hover {
+  background: rgba(20, 184, 166, 0.05);
+  border-color: var(--accent);
+}
+
+.start-btn {
+  margin-top: var(--space-4);
+  background: var(--card);
+  color: var(--text-muted);
+  padding: 16px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: not-allowed;
+}
+
+.start-btn.valid {
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.3);
+}
+
+.start-btn.valid:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.4);
+}

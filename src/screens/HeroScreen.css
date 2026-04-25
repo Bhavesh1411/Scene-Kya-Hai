@@ -1,0 +1,208 @@
+.hero-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-background-cards {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ambient-card-wrapper {
+  position: absolute;
+  width: 220px;
+  transform-style: preserve-3d;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  background: radial-gradient(circle, rgba(2, 6, 23, 0.8) 0%, transparent 70%);
+  padding: var(--space-8);
+  border-radius: 50%;
+}
+
+.hero-title {
+  font-size: 4.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.text-gradient {
+  color: var(--primary);
+}
+
+.hero-subtitle {
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  max-width: 480px;
+}
+
+.cta-button {
+  background: var(--primary);
+  color: white;
+  padding: 16px 40px;
+  border-radius: var(--radius-md);
+  font-size: 1.25rem;
+  font-weight: 700;
+  width: fit-content;
+  box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
+}
+
+.cta-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(59, 130, 246, 0.5);
+  background: #2563eb;
+}
+
+/* Spotlight Elements */
+.spotlight {
+  position: absolute;
+  bottom: 0;
+  width: 120px;
+  height: 200px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.spotlight-left {
+  left: 5%;
+}
+
+.spotlight-right {
+  right: 5%;
+}
+
+.spotlight-stand {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stand-head {
+  width: 32px;
+  height: 24px;
+  background: #1e293b;
+  border-radius: 4px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
+.stand-head::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 12px;
+  height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #fff;
+}
+
+.stand-base {
+  width: 4px;
+  height: 40px;
+  background: #0f172a;
+}
+
+.stand-base::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: #0f172a;
+  border-radius: 2px;
+}
+
+.spotlight-beam {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  width: 400px;
+  height: 100vh;
+  background: linear-gradient(to top, 
+    rgba(255, 255, 255, 0.25) 0%, 
+    rgba(255, 255, 255, 0.1) 40%, 
+    transparent 100%
+  );
+  transform-origin: bottom center;
+  mask-image: radial-gradient(ellipse at bottom, black 0%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at bottom, black 0%, transparent 70%);
+  filter: blur(8px);
+  opacity: 0.3;
+}
+
+.spotlight-left .spotlight-beam {
+  transform: translateX(-50%) rotate(40deg);
+}
+
+.spotlight-right .spotlight-beam {
+  transform: translateX(-50%) rotate(-40deg);
+}
+
+.spotlight-target {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.spotlight-target::after {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Diagonal Ambient Sweep */
+.diagonal-sweep {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 0%,
+    transparent 40%,
+    rgba(255, 255, 255, 0.08) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  transform: rotate(-15deg);
+  pointer-events: none;
+  z-index: 5;
+  filter: blur(120px);
+}
+
+@media (max-width: 1024px) {
+  .spotlight {
+    display: none; /* Hide on small screens to avoid clutter */
+  }
+}
