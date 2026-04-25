@@ -87,12 +87,22 @@
   display: flex;
   flex-direction: column;
   padding: 40px;
-  cursor: grab;
   color: #1e293b;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-.movie-swipe-card:active {
+.movie-swipe-card.active-card {
+  cursor: grab;
+  z-index: 100;
+}
+
+.movie-swipe-card.background-card {
+  cursor: default;
+  pointer-events: none;
+}
+
+.movie-swipe-card:active.active-card {
   cursor: grabbing;
 }
 
@@ -113,14 +123,37 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #000;
+  margin: 10px 0;
+}
+
+.movie-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.8;
+  z-index: 1;
 }
 
 .card-body h1 {
-  font-size: 3rem;
+  position: relative;
+  z-index: 2;
+  font-size: 2.5rem;
   font-weight: 900;
   margin: 0;
   line-height: 1.1;
-  color: #0f172a;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+  padding: 10px 20px;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+  width: 90%;
 }
 
 .card-footer {

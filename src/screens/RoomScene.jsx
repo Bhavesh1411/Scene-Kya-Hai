@@ -8,15 +8,21 @@ const RoomScene = ({ onStartVoting }) => {
   const [players, setPlayers] = useState(() => {
     const saved = localStorage.getItem('moviePlayers');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      // If it's the old mock data (suggestions is an array), ignore it
-      if (parsed.length > 0 && Array.isArray(parsed[0].suggestions)) return [];
-      return parsed;
+      try {
+        const parsed = JSON.parse(saved);
+        // Migration: Convert old single 'suggestion' to 'suggestions' array
+        return parsed.map(p => ({
+          ...p,
+          suggestions: p.suggestions || (p.suggestion ? [p.suggestion] : [])
+        }));
+      } catch (e) {
+        return [];
+      }
     }
     return [];
   });
   const [playerName, setPlayerName] = useState('');
-  const [movieSuggestion, setMovieSuggestion] = useState('');
+  const [movieSuggestions, setMovieSuggestions] = useState(['']);
   const [error, setError] = useState('');
 
   const containerRef = useRef(null);
@@ -38,6 +44,7 @@ const RoomScene = ({ onStartVoting }) => {
 
   const openInputModal = () => {
     setIsModalOpen(true);
+    setMovieSuggestions(['']); // Reset to one empty field
     requestAnimationFrame(() => {
       gsap.to(overlayRef.current, { opacity: 1, pointerEvents: 'all', duration: 0.4 });
       gsap.fromTo(
@@ -58,9 +65,21 @@ const RoomScene = ({ onStartVoting }) => {
         setIsModalOpen(false);
         setError('');
         setPlayerName('');
-        setMovieSuggestion('');
+        setMovieSuggestions(['']);
       },
     });
+  };
+
+  const addSuggestionField = () => {
+    if (movieSuggestions.length < 5) {
+      setMovieSuggestions([...movieSuggestions, '']);
+    }
+  };
+
+  const updateSuggestion = (index, value) => {
+    const newSugs = [...movieSuggestions];
+    newSugs[index] = value;
+    setMovieSuggestions(newSugs);
   };
 
   const handleAddPlayer = () => {
@@ -68,6 +87,13 @@ const RoomScene = ({ onStartVoting }) => {
       setError('Player name is required!');
       return;
     }
+    
+    const validSuggestions = movieSuggestions.map(s => s.trim()).filter(s => s !== '');
+    if (validSuggestions.length === 0) {
+      setError('At least one movie suggestion is required!');
+      return;
+    }
+
     if (players.length >= 5) {
       setError('Max 5 players allowed.');
       return;
@@ -76,16 +102,15 @@ const RoomScene = ({ onStartVoting }) => {
     const newPlayerData = {
       id: Date.now(),
       name: playerName.trim(),
-      suggestion: movieSuggestion.trim(),
+      suggestions: validSuggestions,
       color: `hsl(${Math.random() * 360}, 70%, 60%)`,
     };
 
     setPlayers([...players, newPlayerData]);
     setPlayerName('');
-    setMovieSuggestion('');
+    setMovieSuggestions(['']);
     setError('');
     
-    // Close modal after adding
     closeInputModal();
   };
 
@@ -141,13 +166,24 @@ const RoomScene = ({ onStartVoting }) => {
             />
           </div>
           <div className="input-group">
-            <label>What's your pick? (Optional)</label>
-            <input 
-              type="text" 
-              value={movieSuggestion} 
-              onChange={(e) => setMovieSuggestion(e.target.value)}
-              placeholder="e.g. Inception"
-            />
+            <label>Movie Suggestions (At least one)</label>
+            <div className="multi-input-container">
+              {movieSuggestions.map((s, idx) => (
+                <input 
+                  key={idx}
+                  type="text" 
+                  value={s} 
+                  onChange={(e) => updateSuggestion(idx, e.target.value)}
+                  placeholder={`Suggestion #${idx + 1}`}
+                  className="multi-input"
+                />
+              ))}
+              {movieSuggestions.length < 5 && (
+                <button className="add-more-sug-btn" onClick={addSuggestionField}>
+                  + Add Another Movie
+                </button>
+              )}
+            </div>
           </div>
           {error && <p className="input-error">{error}</p>}
           <button className="confirm-add-btn" onClick={handleAddPlayer}>
@@ -166,9 +202,11 @@ const RoomScene = ({ onStartVoting }) => {
           >
             <div className="chip-content">
               <span className="chip-name">{player.name}</span>
-              {player.suggestion && (
-                <span className="chip-suggestion">picks "{player.suggestion}"</span>
-              )}
+              <div className="chip-suggestions-list">
+                {player.suggestions.map((s, idx) => (
+                  <span key={idx} className="chip-suggestion-mini">{s}</span>
+                ))}
+              </div>
             </div>
             <button className="chip-remove" onClick={() => removePlayer(player.id)}>×</button>
           </div>

@@ -193,6 +193,21 @@ const HeroScreen = ({ onStart }) => {
           }
         }
       );
+      // Fast Typewriter Effect
+      const tlText = gsap.timeline({ delay: 0.5 });
+      tlText.to(".char-1", {
+        opacity: 1,
+        stagger: 0.03,
+        duration: 0.01,
+        ease: "none"
+      });
+      tlText.to(".char-2", {
+        opacity: 1,
+        stagger: 0.03,
+        duration: 0.01,
+        ease: "none"
+      }, "+=0.2");
+
     }, containerRef);
 
     return () => ctx.revert();
@@ -240,6 +255,14 @@ const HeroScreen = ({ onStart }) => {
     }, 0);
   };
 
+  const renderChars = (text, className) => {
+    return text.split('').map((char, i) => (
+      <span key={i} className={className} style={{ opacity: 0 }}>
+        {char}
+      </span>
+    ));
+  };
+
   return (
     <div ref={containerRef} className="hero-container">
       {/* Cinematic Spotlights */}
@@ -283,8 +306,8 @@ const HeroScreen = ({ onStart }) => {
 
       <div className="hero-content">
         <h1 className="hero-title">
-          Decide Together.<br />
-          <span className="text-gradient">Watch Better.</span>
+          <div className="line-1">{renderChars("Decide Together.", "char-1")}</div>
+          <div className="line-2 text-gradient">{renderChars("Watch Better.", "char-2")}</div>
         </h1>
         <p className="hero-subtitle">
           Swipe. Vote. Discover your group’s perfect movie.

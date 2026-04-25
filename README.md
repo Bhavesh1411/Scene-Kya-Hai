@@ -1,20 +1,97 @@
-<<<<<<< HEAD
-# React + Vite
+# 🎬 Scene Kya Hai?
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Friends decide. Votes collide. One movie wins.**
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 📖 About
 
-## React Compiler
+**Scene Kya Hai?** is a fun, interactive movie voting web app that helps friends decide what to watch together — without the arguments.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Each player swipes through movie suggestions from the group. The app tallies all the votes and reveals the winning movie in a cinematic podium reveal experience. No backend. No setup. Just pure movie-night vibes.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# Scene-Kya-Hai
->>>>>>> 6989610e978846ae943f4fb3ca30d65910fd53e1
+## 📸 Preview
+
+![Scene Kya Hai Hero Screen](./public/room-bg.png)
+
+---
+
+## ✨ Features
+
+| Feature | Description |
+|---|---|
+| 🎬 **Swipe Voting** | Right = Like · Left = Dislike · Up = Love |
+| 👥 **Multi-Player** | Turn-based voting for up to 5 players |
+| 🃏 **Floating Cards** | Gesture-controlled cards with GSAP animations |
+| 🎭 **Cinematic UI** | Immersive movie-room interface |
+| 🎥 **Countdown** | Dramatic countdown video before results |
+| 🏆 **Podium Reveal** | Sports-style winner announcement with confetti |
+| 💾 **No Backend** | Fully powered by localStorage |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Frontend:** React · HTML · CSS · JavaScript
+- **Animations:** GSAP · CSS Keyframes
+- **Storage:** localStorage (no backend required)
+- **Build Tool:** Vite
+
+---
+
+## 🚀 How It Works
+
+```
+1️⃣  Add Players  →  Each player enters their name + movie suggestions
+2️⃣  Start Voting  →  Players take turns swiping through all suggestions
+3️⃣  Vote        →  Swipe right (Like), left (Dislike), or up (Love)
+4️⃣  Countdown   →  Dramatic countdown plays after all votes are cast
+5️⃣  Results     →  Cinematic podium reveals the winner 🏆
+```
+
+---
+
+## 🔢 Scoring System
+
+| Swipe | Vote | Points |
+|---|---|---|
+| ↑ Up | LOVE | 3 pts |
+| → Right | YES | 1 pt |
+| ← Left | NO | 0 pts |
+
+The movie with the **highest total points** wins.
+
+---
+
+## 🏃 Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Run the development server
+npm run dev
+```
+
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
+
+---
+
+## 🔮 Future Improvements
+
+- 🌐 Real-time multiplayer (WebSocket / backend integration)
+- 🔗 Online room sharing via invite link
+- 🔐 User authentication system
+- 📱 Native mobile app (React Native)
+
+---
+
+## 👤 Author
+
+**Bhavesh** — [GitHub](https://github.com/Bhavesh1411)
+
+---
+
+<p align="center">Made with ❤️ for movie nights that actually end with a decision.</p>

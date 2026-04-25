@@ -4,12 +4,13 @@ import HeroScreen from './screens/HeroScreen';
 import RoomScene from './screens/RoomScene';
 import VotingScreen from './screens/VotingScreen';
 import ResultsScreen from './screens/ResultsScreen';
+import CountdownScreen from './screens/CountdownScreen';
 import './App.css';
 
 function App() {
-  const [screen, setScreen] = useState('hero'); // 'hero', 'room', 'voting', 'results'
+  const [screen, setScreen] = useState('hero'); // 'hero', 'room', 'voting', 'countdown', 'results'
   const [players, setPlayers] = useState([]);
-  const [votes, setVotes] = useState({});
+  const [votes, setVotes] = useState([]);
 
   const startRoom = () => setScreen('room');
   
@@ -22,6 +23,10 @@ function App() {
 
   const finishVoting = (finalVotes) => {
     setVotes(finalVotes);
+    setScreen('countdown');
+  };
+
+  const showResults = () => {
     setScreen('results');
   };
 
@@ -43,6 +48,9 @@ function App() {
             players={players} 
             onFinish={finishVoting} 
           />
+        )}
+        {screen === 'countdown' && (
+          <CountdownScreen onCountdownEnd={showResults} />
         )}
         {screen === 'results' && (
           <ResultsScreen 
